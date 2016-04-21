@@ -1,0 +1,122 @@
+/*
+SCSS variables are information about icon's compiled state, stored under its original file name
+
+.icon-home {
+  width: $icon-home-width;
+}
+
+The large array-like variables contain all information about a single icon
+$icon-home: x y offset_x offset_y width height total_width total_height image_path;
+
+At the bottom of this section, we provide information about the spritesheet itself
+$spritesheet: width height image $spritesheet-sprites;
+*/
+$up-arrow-h-name: 'up-arrow-h';
+$up-arrow-h-x: 0px;
+$up-arrow-h-y: 18px;
+$up-arrow-h-offset-x: 0px;
+$up-arrow-h-offset-y: -18px;
+$up-arrow-h-width: 13px;
+$up-arrow-h-height: 8px;
+$up-arrow-h-total-width: 64px;
+$up-arrow-h-total-height: 26px;
+$up-arrow-h-image: '../sprite/sprite.png';
+$up-arrow-h: (0px, 18px, 0px, -18px, 13px, 8px, 64px, 26px, '../sprite/sprite.png', 'up-arrow-h', );
+$up-arrow-name: 'up-arrow';
+$up-arrow-x: 13px;
+$up-arrow-y: 18px;
+$up-arrow-offset-x: -13px;
+$up-arrow-offset-y: -18px;
+$up-arrow-width: 13px;
+$up-arrow-height: 8px;
+$up-arrow-total-width: 64px;
+$up-arrow-total-height: 26px;
+$up-arrow-image: '../sprite/sprite.png';
+$up-arrow: (13px, 18px, -13px, -18px, 13px, 8px, 64px, 26px, '../sprite/sprite.png', 'up-arrow', );
+$vk-name: 'vk';
+$vk-x: 0px;
+$vk-y: 0px;
+$vk-offset-x: 0px;
+$vk-offset-y: 0px;
+$vk-width: 32px;
+$vk-height: 18px;
+$vk-total-width: 64px;
+$vk-total-height: 26px;
+$vk-image: '../sprite/sprite.png';
+$vk: (0px, 0px, 0px, 0px, 32px, 18px, 64px, 26px, '../sprite/sprite.png', 'vk', );
+$vk-hover-name: 'vk_hover';
+$vk-hover-x: 32px;
+$vk-hover-y: 0px;
+$vk-hover-offset-x: -32px;
+$vk-hover-offset-y: 0px;
+$vk-hover-width: 32px;
+$vk-hover-height: 18px;
+$vk-hover-total-width: 64px;
+$vk-hover-total-height: 26px;
+$vk-hover-image: '../sprite/sprite.png';
+$vk-hover: (32px, 0px, -32px, 0px, 32px, 18px, 64px, 26px, '../sprite/sprite.png', 'vk_hover', );
+$spritesheet-width: 64px;
+$spritesheet-height: 26px;
+$spritesheet-image: '../sprite/sprite.png';
+$spritesheet-sprites: ($up-arrow-h, $up-arrow, $vk, $vk-hover, );
+$spritesheet: (64px, 26px, '../sprite/sprite.png', $spritesheet-sprites, );
+
+/*
+The provided mixins are intended to be used with the array-like variables
+
+.icon-home {
+  @include sprite-width($icon-home);
+}
+
+.icon-email {
+  @include sprite($icon-email);
+}
+
+Here are example usages in HTML:
+
+`display: block` sprite:
+<div class="icon-home"></div>
+
+`display: inline-block` sprite:
+<img class="icon-home" />
+*/
+@mixin sprite-width($sprite) {
+  width: nth($sprite, 5);
+}
+
+@mixin sprite-height($sprite) {
+  height: nth($sprite, 6);
+}
+
+@mixin sprite-position($sprite) {
+  $sprite-offset-x: nth($sprite, 3);
+  $sprite-offset-y: nth($sprite, 4);
+  background-position: $sprite-offset-x  $sprite-offset-y;
+}
+
+@mixin sprite-image($sprite) {
+  $sprite-image: nth($sprite, 9);
+  background-image: url(#{$sprite-image});
+}
+
+@mixin sprite($sprite) {
+  @include sprite-image($sprite);
+  @include sprite-position($sprite);
+  @include sprite-width($sprite);
+  @include sprite-height($sprite);
+}
+
+/*
+The `sprites` mixin generates identical output to the CSS template
+  but can be overridden inside of SCSS
+
+@include sprites($spritesheet-sprites);
+*/
+@mixin sprites($sprites) {
+  @each $sprite in $sprites {
+    $sprite-name: nth($sprite, 10);
+    .#{$sprite-name} {
+      @include sprite($sprite);
+    }
+  }
+}
