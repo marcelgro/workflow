@@ -1,4 +1,4 @@
-var gulp       = require('gulp'), 
+var gulp         = require('gulp'),
 	sass         = require('gulp-sass'), 
 	browserSync  = require('browser-sync'), 
 	concat       = require('gulp-concat'), 
@@ -12,13 +12,20 @@ var gulp       = require('gulp'),
 	autoprefixer = require('gulp-autoprefixer'),
 	jade         = require('gulp-jade'),
 	sprite       = require('gulp.spritesmith'),
-    plumber      = require('gulp-plumber');
+    plumber      = require('gulp-plumber'),
+    notify       = require('gulp-notify');
 
 // Компиляция sass + autoprefixer
-
 gulp.task('sass', function(){ 
 	return gulp.src('app/sass/*.scss')
-        .pipe(plumber())
+        .pipe(plumber({
+            errorHandler: notify.onError(function (err) {
+                return {
+                    title: "Styles",
+                    message: err.message
+                };
+            })
+        }))
 		.pipe(sass({pretty: true})) 
 		.pipe(autoprefixer(['last 15 versions', '> 1%', 'ie 8', 'ie 7'], { cascade: true })) 
 		.pipe(gulp.dest('app/css')) 
@@ -26,17 +33,22 @@ gulp.task('sass', function(){
 });
 
 // Компиляция в jade
-
 gulp.task('jade', function () {
 	return gulp.src('app/jade/*.jade')
-        .pipe(plumber())
+        .pipe(plumber({
+            errorHandler: notify.onError(function (err) {
+                return {
+                    title: "Template",
+                    message: err.message
+                };
+            })
+        }))
         .pipe(jade({pretty: true}))
         .pipe(gulp.dest('app'))
         .pipe(browserSync.reload({stream: true}))
 });
 
 // Генерация спрайтов
-
 gulp.task('sprite', function () {
 	var spriteData = gulp.src('app/img/*.png')
 	.pipe(sprite({
@@ -48,7 +60,6 @@ gulp.task('sprite', function () {
 });
 
 // реализация browser-sync
-
 gulp.task('browser-sync', function() { 
 	browserSync({ 
 		port: 9000,
@@ -60,17 +71,25 @@ gulp.task('browser-sync', function() {
 });
 
 // минифицировние js файлов и библиотек
-
 gulp.task('scripts', function() {
-	return gulp.src('app/js/common.js')
-        .pipe(plumber())
+	return gulp.src([
+	    'app/libs/jquery/jquery-3.1.0.js',
+        'app/libs/slick-carousel/slick/slick.min.js'
+    ])
+        .pipe(plumber(plumber({
+            errorHandler: notify.onError(function (err) {
+                return {
+                    title: "Scripts",
+                    message: err.message
+                };
+            })
+        })))
 		.pipe(concat('libs.min.js')) 
 		.pipe(uglify()) 
 		.pipe(gulp.dest('app/js')); 
 });
 
 // минифицировние файлов css различных плагинов
-
 gulp.task('css-libs', ['sass'], function() {
 	return gulp.src('app/css/libs.css') 
 		.pipe(cssnano())
@@ -79,7 +98,6 @@ gulp.task('css-libs', ['sass'], function() {
 });
 
 // стандартная слежка
-
 gulp.task('watch', ['browser-sync', 'css-libs', 'jade', 'scripts'], function() {
 	gulp.watch('app/jade/**/*.jade', ['jade']);
 	gulp.watch('app/sass/**/*.scss', ['sass']); 
@@ -91,13 +109,11 @@ gulp.task('watch', ['browser-sync', 'css-libs', 'jade', 'scripts'], function() {
 });
 
 // очистка директории dist
-
 gulp.task('clean', function() {
 	return del.sync('dist');
 });
 
 // оптимизация изображений и их кэширование
-
 gulp.task('img', function() {
 	return gulp.src('app/img/**/*')
 		.pipe(cache(imagemin({
@@ -109,13 +125,14 @@ gulp.task('img', function() {
 		.pipe(gulp.dest('dist/img'));
 });
 
-// сборка проекта
 
+// сборка проекта
 gulp.task('build', ['clean', 'img', 'sass', 'jade', 'scripts', 'sprite'], function() {
 
 	var buildCss = gulp.src([ 
 		'app/css/main.css',
-		'app/css/libs.min.css'
+		'app/css/libs.min.css',
+        'app/css/fonts.css'
 		])
 	.pipe(gulp.dest('dist/css'))
 
@@ -134,11 +151,9 @@ gulp.task('build', ['clean', 'img', 'sass', 'jade', 'scripts', 'sprite'], functi
 });
 
 // очистка кэша
-
 gulp.task('clear', function (callback) {
 	return cache.clearAll();
 })
 
 // задача по умолчанию
-
 gulp.task('default', ['watch']);
