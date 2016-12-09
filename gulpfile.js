@@ -15,7 +15,7 @@ var gulp         = require('gulp'),
     plumber      = require('gulp-plumber'),
     notify       = require('gulp-notify');
 
-// Компиляция sass + autoprefixer
+// compile sass + autoprefixer
 gulp.task('sass', function(){ 
 	return gulp.src('app/sass/*.scss')
         .pipe(plumber({
@@ -32,7 +32,7 @@ gulp.task('sass', function(){
 		.pipe(browserSync.reload({stream: true})) 
 });
 
-// Компиляция в jade
+// compile jade
 gulp.task('jade', function () {
 	return gulp.src('app/jade/*.jade')
         .pipe(plumber({
@@ -48,7 +48,7 @@ gulp.task('jade', function () {
         .pipe(browserSync.reload({stream: true}))
 });
 
-// Генерация спрайтов
+// sprites generation
 gulp.task('sprite', function () {
 	var spriteData = gulp.src('app/img/*.png')
 	.pipe(sprite({
@@ -59,7 +59,7 @@ gulp.task('sprite', function () {
 	return spriteData.pipe(gulp.dest('app/sprite/'));
 });
 
-// реализация browser-sync
+// auto reloading browser browser-sync
 gulp.task('browser-sync', function() { 
 	browserSync({ 
 		port: 9000,
@@ -70,7 +70,7 @@ gulp.task('browser-sync', function() {
 	});
 });
 
-// минифицировние js файлов и библиотек
+// min js files and libraries
 gulp.task('scripts', function() {
 	return gulp.src([
 	    'app/libs/jquery/jquery-3.1.0.js',
@@ -89,7 +89,7 @@ gulp.task('scripts', function() {
 		.pipe(gulp.dest('app/js')); 
 });
 
-// минифицировние файлов css различных плагинов
+// min CSS files(libraries)
 gulp.task('css-libs', ['sass'], function() {
 	return gulp.src('app/css/libs.css') 
 		.pipe(cssnano())
@@ -97,7 +97,7 @@ gulp.task('css-libs', ['sass'], function() {
 		.pipe(gulp.dest('app/css')); 
 });
 
-// стандартная слежка
+// Watching
 gulp.task('watch', ['browser-sync', 'css-libs', 'jade', 'scripts'], function() {
 	gulp.watch('app/jade/**/*.jade', ['jade']);
 	gulp.watch('app/sass/**/*.scss', ['sass']); 
@@ -108,12 +108,12 @@ gulp.task('watch', ['browser-sync', 'css-libs', 'jade', 'scripts'], function() {
   ]).on('change', browserSync.reload);
 });
 
-// очистка директории dist
+// Clean dist directory
 gulp.task('clean', function() {
 	return del.sync('dist');
 });
 
-// оптимизация изображений и их кэширование
+// optimization images and their chache
 gulp.task('img', function() {
 	return gulp.src('app/img/**/*')
 		.pipe(cache(imagemin({
@@ -126,7 +126,7 @@ gulp.task('img', function() {
 });
 
 
-// сборка проекта
+// build project
 gulp.task('build', ['clean', 'img', 'sass', 'jade', 'scripts', 'sprite'], function() {
 
 	var buildCss = gulp.src([ 
@@ -150,10 +150,10 @@ gulp.task('build', ['clean', 'img', 'sass', 'jade', 'scripts', 'sprite'], functi
 
 });
 
-// очистка кэша
+// clean chache
 gulp.task('clear', function (callback) {
 	return cache.clearAll();
 })
 
-// задача по умолчанию
+// default task
 gulp.task('default', ['watch']);
