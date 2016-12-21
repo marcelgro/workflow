@@ -23,7 +23,8 @@ gulp.task('browser-sync', function() {
 	browserSync({
 		port: 9000,
 		server: {
-			baseDir: 'app'
+			baseDir: 'app',
+			directory: true
 		},
 		notify: false
 	});
@@ -47,7 +48,7 @@ gulp.task('pug', function () {
 
 // compile sass > autoprefix > save to app
 gulp.task('sass', function(){
-	return gulp.src('app/assets/sass/*.scss')
+	return gulp.src('app/assets/sass/main.scss')
         .pipe(plumber({
             errorHandler: notify.onError(function (err) {
                 return {
