@@ -48,7 +48,11 @@ gulp.task('pug', function () {
 
 // compile sass > autoprefix > save to app
 gulp.task('sass', function(){
-	return gulp.src('app/assets/sass/main.scss')
+	return gulp.src([
+		'app/assets/sass/base/*.scss',
+		'app/assets/sass/helpers/*.scss',
+		'app/assets/sass/components/*.scss'
+	])
         .pipe(plumber({
             errorHandler: notify.onError(function (err) {
                 return {
@@ -57,6 +61,7 @@ gulp.task('sass', function(){
                 };
             })
         }))
+		.pipe(concat('all.scss'))
 		.pipe(sass({pretty: true}))
 		.pipe(autoprefixer(['last 15 versions', '> 1%', 'ie 8', 'ie 7'], { cascade: true }))
 		.pipe(rename("style.css"))
@@ -141,7 +146,7 @@ gulp.task('optimize-img', function() {
 
 // placeholders > save to dist
 gulp.task('copy-placeholder', function() {
-	return gulp.src('app/assets/img/placeholders/*')
+	return gulp.src('app/assets/img/placeholder/*')
 		.pipe(gulp.dest('dist/img'));
 });
 
