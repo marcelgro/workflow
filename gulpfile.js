@@ -13,10 +13,12 @@ var gulp         = require('gulp'),
 		pug          = require('gulp-pug'),
 		sprite       = require('gulp.spritesmith'),
     plumber      = require('gulp-plumber'),
-    notify       = require('gulp-notify');
+    notify       = require('gulp-notify'),
+		gap 				 = require('gulp-append-prepend');
+		replace 		 = require('gulp-replace');
 
 
-// ## Development
+// ## Dev Tasks
 
 // start browserSync
 gulp.task('browser-sync', function() {
@@ -43,7 +45,6 @@ gulp.task('pug', function () {
         }))
         .pipe(pug({pretty: true}))
         .pipe(gulp.dest('app'))
-        //.pipe(browserSync.reload({stream: true}))
 });
 
 // compile sass > autoprefix > save to app
@@ -66,13 +67,12 @@ gulp.task('sass', function(){
 		.pipe(autoprefixer(['last 15 versions', '> 1%', 'ie 8', 'ie 7'], { cascade: true }))
 		.pipe(rename("style.css"))
 		.pipe(gulp.dest('app'))
-		//.pipe(browserSync.reload({stream: true}))
 });
 
 // compile js > save to app
 gulp.task('js', function() {
 	return gulp.src([
-	    'app/js/*.js'
+	    'app/assets/js/*.js'
   ])
   .pipe(plumber(plumber({
     errorHandler: notify.onError(function (err) {
@@ -86,21 +86,8 @@ gulp.task('js', function() {
 	.pipe(gulp.dest('app'));
 });
 
-// generate sprites
-/*
-gulp.task('sprite', function () {
-	var spriteData = gulp.src('app/assets/img/*.png')
-	.pipe(sprite({
-		imgName: 'sprite.png',
-		cssName: 'sprite.scss',
-		imgPath: '../sprite/sprite.png'
-	}));
-	return spriteData.pipe(gulp.dest('app/sprite/'));
-});
-*/
 
-
-// ## Building
+// ## Build tasks
 
 // clean dist
 gulp.task('clean', function() {
@@ -128,7 +115,6 @@ gulp.task('build-js', function() {
     })
   })))
 	.pipe(uglify())
-	.pipe(rename({suffix: '.min'}))
 	.pipe(gulp.dest('dist'));
 });
 
@@ -144,16 +130,10 @@ gulp.task('optimize-img', function() {
 		.pipe(gulp.dest('dist/img'));
 });
 
-// placeholders > save to dist
-gulp.task('copy-placeholder', function() {
-	return gulp.src('app/assets/img/placeholder/*')
-		.pipe(gulp.dest('dist/img'));
-});
 
+// ## Actions
 
-// ## Tasks
-
-// Watch Task
+// Watch Changes
 gulp.task('watch', ['browser-sync','pug','sass','js'] , function() {
 	gulp.watch('app/assets/pug/**/*.pug', ['pug']);
 	gulp.watch('app/assets/sass/**/*.scss', ['sass']);
@@ -165,14 +145,23 @@ gulp.task('watch', ['browser-sync','pug','sass','js'] , function() {
   ]).on('change', browserSync.reload);
 });
 
-// Build Task
-gulp.task('build', ['clean','build-css','build-js','optimize-img','copy-placeholder'], function() {
+// Build Files
+gulp.task('build', ['pug','sass','js','clean','build-css','build-js','optimize-img'], function() {
 
 	var copy = gulp.src('app/*.html')
 	.pipe(gulp.dest('dist'))
 
-	// var buildSprite = gulp.src('app/sprite/**/*')
-	// .pipe(gulp.dest('dist/sprite'));
+});
+
+// Move Style to Wordpress Theme Folder
+gulp.task('move', ['build'], function() {
+
+	var style = gulp.src('dist/style.css')
+	.pipe(gap.prependText('/* Theme Name: webspawn.de */'))
+	.pipe(gulp.dest('..'))
+
+	var script = gulp.src('dist/script.js')
+	.pipe(gulp.dest('..'))
 
 });
 
