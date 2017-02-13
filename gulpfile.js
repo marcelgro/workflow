@@ -163,6 +163,9 @@ gulp.task('move', ['build'], function() {
 	var script = gulp.src('dist/script.js')
 	.pipe(gulp.dest('..'))
 
+	var images = gulp.src('dist/img')
+	.pipe(gulp.dest('img'))
+
 });
 
 
